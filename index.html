@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<meta charset="utf-8">
+</head>
+<body>
+	
+	<input type="text" name="search" id="search">
+	<input type="button" id="submit" value="Pesquisar"></input>	
+	<div id="videos">
+			
+			<div  v-for="li in results.items"><iframe class="iframe" width="560" height="315" :src="'https://www.youtube.com/embed/' + li.id.videoId" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+				<button class="select-video" v-on:click="select(li.id.videoId)" :value="li.id.videoId">Selecionar</button>
+			</div>
+
+		
+	</div>
+	<form>
+		<input type="hidden" id="video-input" name="video">
+		<input type="submit">
+	</form>
+</body>
+<script src="https://unpkg.com/vue"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script type="text/javascript" src="auth.js"></script>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+	/*Fazendo a requisição e mostrando o video!*/	
+	var videos = new Vue({
+      el: '#videos',
+          data: {
+          results: [
+         
+          ],
+        },
+        methods: {
+          getVideos: function(q) {
+            axios.get('https://www.googleapis.com/youtube/v3/search', {params:{part: 'id', q: q, type:'video', key:'AIzaSyCnAlD9ZyhG3271N-jJZS0yvwCYTlGyj-4'}}).then(response => {
+              this.results = response.data;
+            })
+          },
+          select: function(val) {
+          	selectVideo(val);
+          }
+        }
+ 	 });
+
+	/*Obtendo a keyword por meio de uma barra de pesquisa*/
+	$('#submit').click(function(){
+		var q = $('#search').val();
+		videos.getVideos(q);//Enviando a keyword via requisição http com Vue
+	});
+	
+	/*Salvando o video selecionado*/
+	function selectVideo(id){
+		$('#video-input').val(id);
+		$('#videos').css({
+			display: 'none'
+		});
+	}
+		
+	});
+
+	
+</script>
+</html>
